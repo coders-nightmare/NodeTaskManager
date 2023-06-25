@@ -3,22 +3,25 @@ const app = express();
 //import creates routes
 const tasks = require("./routes/tasks");
 const connectDB = require("./db/connect");
-
+const notFound = require("./middleware/not-found");
+const errorHandlerMiddleware = require("./middleware/error-handler");
 require("dotenv").config();
 
 //middleware
 // to parse data from req.body in json format
 app.use(express.json());
+//loading front end
+app.use(express.static("./public"));
 
 //routes
-app.get("/hello", (req, res) => {
-  res.send("Task Manager and App");
-});
-
 //get all task
 app.use("/api/v1/tasks", tasks);
+//wrong routes
+app.use(notFound);
 
-const port = 3000;
+//handling error - any error passed to next() is handled by express
+app.use(errorHandlerMiddleware);
+const port = process.env.PORT || 3000;
 
 const start = async () => {
   try {
